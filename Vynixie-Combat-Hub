@@ -1,29 +1,56 @@
-local Library = loadstring(game:HttpGet("https://pastebin.com/raw/vff1bQ9F"))()
-local Window = Library.CreateLib("Vynixie Combat Hub", "DarkTheme")
-local Tab = Window:NewTab("Main")
-local Section = Tab:NewSection("Omg👀")
-Section:NewButton("Hitbox v0.1.1", "ButtonInfo", function()
-loadstring(game:HttpGet("https://pastebin.com/raw/vk5xsDiB"))()
-    print("Clicked")
+-- Ping based parry by Fsploit 
+getgenv().Paws = {
+        ["AutoParry"] = true,
+        ["PingBased"] = true,
+        ["PingBasedOffset"] = 0,
+        ["DistanceToParry"] = 0.5,
+        ["BallSpeedCheck"] = true,
+}
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local ReplicatedPaw = game:GetService("ReplicatedStorage")
+
+local Paws = ReplicatedPaw:WaitForChild("Remotes", 9e9)
+local PawsBalls = workspace:WaitForChild("Balls", 9e9)
+local PawsTable = getgenv().Paws
+
+local function IsTheTarget()
+        return Player.Character:FindFirstChild("Highlight")
+end
+
+local function FindBall()
+    local RealBall
+    for i, v in pairs(PawsBalls:GetChildren()) do
+        if v:GetAttribute("realBall") == true then
+            RealBall = v
+        end
+    end
+    return RealBall
+end
+
+game:GetService("RunService").PreRender:connect(function()
+        if not FindBall() then 
+                return
+        end
+        local Ball = FindBall()
+        
+        local BallPosition = Ball.Position
+        
+        local BallVelocity = Ball.AssemblyLinearVelocity.Magnitude
+        
+        local Distance = Player:DistanceFromCharacter(BallPosition)
+        
+        local Ping = BallVelocity * (game.Stats.Network.ServerStatsItem["Data Ping"]:GetValue() / 1000)
+        
+        if PawsTable.PingBased then
+        Distance -= Ping + PawsTable.PingBasedOffset
+        end
+        
+        if PawsTable.BallSpeedCheck and BallVelocity == 0 then return
+        end
+        
+        if (Distance / BallVelocity) <= PawsTable.DistanceToParry and IsTheTarget() and PawsTable.AutoParry then
+               Paws:WaitForChild("ParryButtonPress"):Fire()
+           end
 end)
-Section:NewButton("Esp v0.1.1", "ButtonInfo", function()
-loadstring(game:HttpGet("https://pastebin.com/raw/7K1Jhmck"))()
-    print("Clicked")
-end)
-Section:NewButton("Fly gui v0.1.1", "ButtonInfo", function()
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Pro69Yes/sussy-Script/main/SecuredFlyGuiv3.lua'))()
-    print("Clicked")
-end)
-Section:NewButton("inf yeild", "ButtonInfo", function()
-loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-    print("Clicked")
-end)
-Section:NewButton("Arceus Aim bot v0.1.1", "ButtonInfo", function()
-loadstring(game:HttpGet("https://pastebin.com/raw/1Gp9c57U"))()
-    print("Clicked")
-end)
-local Tab = Window:NewTab("Supported games")
-local Section = Tab:NewSection("Any combat games are supported")
-local Tab = Window:NewTab("Info")
-local Section = Tab:NewSection("Ui by Fsploit")
-local Section = Tab:NewSection("version 0.1.1 Beta")
